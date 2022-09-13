@@ -37,7 +37,7 @@ public class Unit : MonoBehaviour
             _health = _health > 100 ? 100 : _health += 5;
             timeHealing -= 0.5f;
             Debug.Log(_health);
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSecondsRealtime(0.5f);
             if (timeHealing <= 0)
             {
                 isT = false;
