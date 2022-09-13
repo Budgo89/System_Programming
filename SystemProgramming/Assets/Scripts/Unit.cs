@@ -34,18 +34,17 @@ public class Unit : MonoBehaviour
         bool isT = true;
         while (isT)
         {
-            _health += 5;
+            _health = _health > 100 ? 100 : _health += 5;
             timeHealing -= 0.5f;
             Debug.Log(_health);
             yield return new WaitForSeconds(0.5f);
             if (timeHealing <= 0)
             {
                 isT = false;
-                if (_health > 100) _health = 100;
+                isHealing = true;
             }
-
         }
 
-        isHealing = true;
+        
     }
 }
