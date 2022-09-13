@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 using Task = System.Threading.Tasks.Task;
 
@@ -12,28 +13,35 @@ public class TaskTest : MonoBehaviour, IDisposable
         using (cancelTokenSource = new CancellationTokenSource())
         {
             CancellationToken cancelToken = cancelTokenSource.Token;
-            _ = Task1(cancelToken);
-            _ = Task2(cancelToken, 60);
+            Task task1 = Task.Run(() => Task1(cancelToken, 1));
+            Task task2 = Task.Run(() => Task2(cancelToken, 60));
+            var result  = WhatTaskFasterAsync(cancelTokenSource, task1, task2);
+            Task.WaitAny(result);
+            Debug.Log(result.Result);
         }
 
     }
 
-    async Task Task1(CancellationToken cancelToken)
+    async Task Task1(CancellationToken cancelToken, float times)
     {
-        if (cancelToken.IsCancellationRequested)
+        while (times > 0)
         {
-            return;
-        }
+            if (cancelToken.IsCancellationRequested != true)
+            {
+                return;
+            }
 
-        await Task.Delay(1000);
-        Debug.Log("Task1 отработал");
+            times -= 0.1f;
+            await Task.Delay(100);
+            Debug.Log("Task1 отработал");
+        }
     }
     async Task Task2(CancellationToken cancelToken, int times)
     {
 
         while (times > 0)
         {
-            if (cancelToken.IsCancellationRequested)
+            if (cancelToken.IsCancellationRequested != true)
             {
                 return;
             }
@@ -44,7 +52,12 @@ public class TaskTest : MonoBehaviour, IDisposable
         Debug.Log("Task2 отработал");
     }
 
-
+    public static async Task<bool> WhatTaskFasterAsync(CancellationTokenSource cancelToken, Task task1, Task task2)
+    {
+        var a = Task.WaitAny(task1, task2);
+        cancelToken.Cancel();
+        return a == 0;
+    }
     public void Dispose()
     {
         cancelTokenSource?.Cancel();
