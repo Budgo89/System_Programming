@@ -14,6 +14,12 @@ public class EntryPoint : MonoBehaviour
     {
         _canvasView.ButtonHealing.onClick.AddListener(Healing);
         _canvasView.ButtonTask1.onClick.AddListener(StartMyJob);
+        _canvasView.ButtonTask2.onClick.AddListener(StartMyIJobParallelFor);
+    }
+
+    private void StartMyIJobParallelFor()
+    {
+        _lesson2.StartMyIJobParallelFor();
     }
 
     private void StartMyJob()
