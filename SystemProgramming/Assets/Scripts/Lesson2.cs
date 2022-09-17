@@ -2,9 +2,17 @@ using System;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
+using UnityEngine.Jobs;
+using static Lesson2;
 
-public class Lesson2 : MonoBehaviour
+public class Lesson2 : MonoBehaviour, IDisposable
 {
+    [SerializeField] private int _speed = 2;
+    [SerializeField] private GameObject _gameObject;
+    private TransformAccessArray _transformAccess;
+    private bool isTask3 = false;
+    private float angles = 1;
+
     private NativeArray<int> array;
 
     public NativeArray<Vector3> Positions;
@@ -25,6 +33,7 @@ public class Lesson2 : MonoBehaviour
         {
             Debug.Log(array[i]);
         }
+        array.Dispose();
     }
 
     public void StartMyIJobParallelFor()
@@ -52,8 +61,42 @@ public class Lesson2 : MonoBehaviour
         {
             Debug.Log(finalPosition);
         }
+        Positions.Dispose();
+        Velocities.Dispose();
+        FinalPositions.Dispose();
     }
-    
+
+    public void StartMyJobForTransform()
+    {
+        _transformAccess = new TransformAccessArray(AddTransform(_gameObject));
+        isTask3 = !isTask3;
+    }
+
+    private void Update()
+    {
+        if (isTask3)
+        {
+            angles = angles + (_speed * Time.deltaTime);
+            if (angles > 360)
+            {
+                angles -=360;
+            }
+
+            MyJobForTransform myJobForTransform = new MyJobForTransform()
+            {
+                angles = angles,
+            };
+            JobHandle jobHandle;
+            jobHandle = myJobForTransform.Schedule(_transformAccess);
+            jobHandle.Complete();
+        }
+    }
+
+    private Transform[] AddTransform(GameObject gameObject)
+    {
+        return new Transform[] { gameObject.transform };
+    }
+
     public struct MyJob : IJob
     {
         public NativeArray<int> arrays;
@@ -82,6 +125,23 @@ public class Lesson2 : MonoBehaviour
         }
     }
 
+    public struct MyJobForTransform : IJobParallelForTransform
+    {
+        public float angles;
+        public void Execute(int index, TransformAccess transform)
+        {
+            transform.localRotation = Quaternion.AngleAxis(angles, Vector3.up);
+        }
+    }
+
+    public void Dispose()
+    {
+        array.Dispose();
+        Positions.Dispose();
+        Velocities.Dispose();
+        FinalPositions.Dispose();
+        _transformAccess.Dispose();
+    }
 }
 
 

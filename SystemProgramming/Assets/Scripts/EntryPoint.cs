@@ -15,6 +15,12 @@ public class EntryPoint : MonoBehaviour
         _canvasView.ButtonHealing.onClick.AddListener(Healing);
         _canvasView.ButtonTask1.onClick.AddListener(StartMyJob);
         _canvasView.ButtonTask2.onClick.AddListener(StartMyIJobParallelFor);
+        _canvasView.ButtonTask3.onClick.AddListener(StartMyJobForTransform);
+    }
+
+    private void StartMyJobForTransform()
+    {
+        _lesson2.StartMyJobForTransform();
     }
 
     private void StartMyIJobParallelFor()
