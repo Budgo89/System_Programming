@@ -30,7 +30,6 @@ public class UIController : MonoBehaviour
 
     private void NicknameChange()
     {
-        //server.NicknameChange();
         client.SendMessage(nickField.text);
         nickField.text = "";
         nickField.gameObject.SetActive(false);

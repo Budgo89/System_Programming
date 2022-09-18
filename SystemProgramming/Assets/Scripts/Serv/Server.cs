@@ -60,10 +60,11 @@ public class Server : MonoBehaviour
                     break;
                 case NetworkEventType.DataEvent:
                     string message = Encoding.Unicode.GetString(recBuffer, 0, dataSize);
+                    ParsMessage(message, connectionId);
                     if (message != "¬ведите ник")
                     {
                         if (users[connectionId] == "")
-                            users[connectionId] = message;
+                            users[connectionId] = NewNick(message);
                         else
                             SendMessageToAll($"{users[connectionId]}: {message}");
                     }
@@ -73,12 +74,6 @@ public class Server : MonoBehaviour
                         SendMessageToAll($"Player {connectionId}: {message}");
                         isNickname = false;
                     }
-                    //if (isNickname)
-                    //{
-                    //    users[connectionId] = message;
-                    //    isNickname = false;
-                    //}
-                    //SendMessageToAll($"Player {connectionId}: {message}");
                     Debug.Log($"Player {connectionId}: {message}");
                     break;
                 case NetworkEventType.DisconnectEvent:
@@ -109,6 +104,44 @@ public class Server : MonoBehaviour
         NetworkTransport.Send(hostID, connectionID, reliableChannel, buffer, message.Length *
                                                                              sizeof(char), out error);
         if ((NetworkError)error != NetworkError.Ok) Debug.Log((NetworkError)error);
+    }
+
+    private string NewNick(string message)
+    {
+        char[] delimiterChars = { ' ', ',', '.', ':', '\t' };
+        string[] words = message.Split(delimiterChars);
+        foreach (var word in words)
+        {
+            if (word != "/nick")
+                return word;
+        }
+
+        return "";
+    }
+    private void ParsMessage(string message, int connectionID)
+    {
+        char[] delimiterChars = { ' ', ',', '.', ':', '\t' };
+        string[] words = message.Split(delimiterChars);
+        foreach (var word in words)
+        {
+            if (word == "/help")
+            {
+                SendMessage("введите /nick 'новый ник' ", connectionID);
+                break;
+            }
+
+            if (word == "/nick")
+            {
+                users[connectionID] = "";
+                isNickname = true;
+                break;
+            }
+
+            if (word == "бл€")
+            {
+                SendMessage("ругатьс€ матом тут запрещено", connectionID);
+            }
+        }
     }
 
     //public void NicknameChange()
