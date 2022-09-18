@@ -12,6 +12,9 @@ public class Server : MonoBehaviour
     private bool isStarted = false;
     private byte error;
     List<int> connectionIDs = new List<int>();
+    private Dictionary<int, string> users = new Dictionary<int, string>();
+
+    private bool isNickname = true;
 
     public void StartServer()
     {
@@ -51,11 +54,31 @@ public class Server : MonoBehaviour
                 case NetworkEventType.ConnectEvent:
                     connectionIDs.Add(connectionId);
                     SendMessageToAll($"Player {connectionId} has connected.");
+                    users.Add(connectionId,"");
+                    isNickname = true;
                     Debug.Log($"Player {connectionId} has connected.");
                     break;
                 case NetworkEventType.DataEvent:
                     string message = Encoding.Unicode.GetString(recBuffer, 0, dataSize);
-                    SendMessageToAll($"Player {connectionId}: {message}");
+                    if (message != "¬ведите ник")
+                    {
+                        if (users[connectionId] == "")
+                            users[connectionId] = message;
+                        else
+                            SendMessageToAll($"{users[connectionId]}: {message}");
+                    }
+
+                    if (isNickname)
+                    {
+                        SendMessageToAll($"Player {connectionId}: {message}");
+                        isNickname = false;
+                    }
+                    //if (isNickname)
+                    //{
+                    //    users[connectionId] = message;
+                    //    isNickname = false;
+                    //}
+                    //SendMessageToAll($"Player {connectionId}: {message}");
                     Debug.Log($"Player {connectionId}: {message}");
                     break;
                 case NetworkEventType.DisconnectEvent:
@@ -87,4 +110,9 @@ public class Server : MonoBehaviour
                                                                              sizeof(char), out error);
         if ((NetworkError)error != NetworkError.Ok) Debug.Log((NetworkError)error);
     }
+
+    //public void NicknameChange()
+    //{
+    //    isNickname = true;
+    //}
 }

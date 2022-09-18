@@ -10,7 +10,9 @@ public class UIController : MonoBehaviour
     [SerializeField] private Button buttonConnectClient;
     [SerializeField] private Button buttonDisconnectClient;
     [SerializeField] private Button buttonSendMessage;
+    [SerializeField] private Button buttonNick;
     [SerializeField] private TMP_InputField inputField;
+    [SerializeField] private TMP_InputField nickField;
     [SerializeField] private TextField textField;
     [SerializeField] private Server server;
     [SerializeField] private Client client;
@@ -22,7 +24,17 @@ public class UIController : MonoBehaviour
         buttonConnectClient.onClick.AddListener(() => Connect());
         buttonDisconnectClient.onClick.AddListener(() => Disconnect());
         buttonSendMessage.onClick.AddListener(() => SendMessage());
+        buttonNick.onClick.AddListener(() => NicknameChange());
         client.onMessageReceive += ReceiveMessage;
+    }
+
+    private void NicknameChange()
+    {
+        //server.NicknameChange();
+        client.SendMessage(nickField.text);
+        nickField.text = "";
+        nickField.gameObject.SetActive(false);
+        buttonNick.gameObject.SetActive(false);
     }
 
     private void StartServer()
