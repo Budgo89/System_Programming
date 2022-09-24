@@ -332,7 +332,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 60}
     m_SelectedIDs: a45b0000
     m_LastClickedID: 23460
-    m_ExpandedIDs: 000000007a5c0000
+    m_ExpandedIDs: 00000000905c0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -360,7 +360,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 000000007a5c0000
+    m_ExpandedIDs: 00000000905c0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -488,9 +488,9 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 
+      m_SelectedIDs: 30f8ffff
       m_LastClickedID: 0
-      m_ExpandedIDs: 149fffff649fffffbca0ffffdaa0ffff58a4ffffa8a4ffff00a6ffff1ea6ffffb4abffff04acffff5cadffff7aadffff56b2ffffa6b2fffffeb3ffff1cb4fffff2b7ffff42b8ffff9ab9ffffb8b9ffff68c4ffffb8c4ffff10c6ffff2ec6ffffa2c9fffff2c9ffff4acbffff68cbfffff4ceffff48cfffffdad0ffff14d1ffff50d7ffffa0d7fffff8d8ffff16d9ffffaedcfffffedcffff56deffff74deffff0ce2ffff5ce2ffffb4e3ffffd2e3ffff2ae9ffff7ee9ffff10ebffff4aebffffa8f1fffff8f1ffff50f3ffff6ef3ffff74f8ffff32fbffffc45a0000165b0000a65b0000707d0000847d0000ec7d0000fa7d0000007e00008292000090920000
+      m_ExpandedIDs: 32fbffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
