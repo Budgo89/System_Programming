@@ -40,6 +40,7 @@ namespace Assets.Scripts
         protected override void Shooting()
         {
             base.Shooting();
+
             if (bullets.Count > 0)
             {
                 StartCoroutine(Shoot());

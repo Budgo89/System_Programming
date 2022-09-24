@@ -86,5 +86,9 @@ namespace Assets.Scripts
                 bulletCountSize * 2), info);
         }
 
+        
+
+
+
     }
 }

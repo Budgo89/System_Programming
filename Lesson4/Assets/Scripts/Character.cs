@@ -12,6 +12,7 @@ public abstract class Character : NetworkBehaviour
     protected abstract FireAction fireAction { get; set; }
     [SyncVar] protected Vector3 serverPosition;
     [SyncVar] protected Quaternion serverRotarion;
+    [SyncVar] protected int serverDps;
     protected virtual void Initiate()
     {
         OnUpdateAction += Movement;
@@ -19,6 +20,19 @@ public abstract class Character : NetworkBehaviour
     private void Update()
     {
         OnUpdate();
+        if (Input.GetMouseButtonDown(0))
+        {
+            RaycastHit hit;
+            var ray = Camera.main.ScreenPointToRay(transform.forward);
+            if (Physics.Raycast(ray, out hit))
+            {
+                var player = hit.collider.gameObject.GetComponent<PlayerCharacter>();
+                if (player != null)
+                {
+                    CmdShooting(50);
+                }
+            }
+        }
     }
     private void OnUpdate()
     {
@@ -31,5 +45,12 @@ public abstract class Character : NetworkBehaviour
         serverRotarion = rotarion;
 
     }
+
+    [Command]
+    protected void CmdShooting(int dps)
+    {
+        serverDps = dps;
+    }
+
     public abstract void Movement();
 }

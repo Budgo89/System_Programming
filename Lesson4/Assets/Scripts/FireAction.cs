@@ -49,6 +49,7 @@ namespace Assets.Scripts
             if (bullets.Count == 0)
             {
                 Reloading();
+
             }
         }
 
