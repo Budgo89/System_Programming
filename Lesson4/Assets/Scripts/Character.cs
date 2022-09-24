@@ -11,6 +11,7 @@ public abstract class Character : NetworkBehaviour
     protected Action OnUpdateAction { get; set; }
     protected abstract FireAction fireAction { get; set; }
     [SyncVar] protected Vector3 serverPosition;
+    [SyncVar] protected Quaternion serverRotarion;
     protected virtual void Initiate()
     {
         OnUpdateAction += Movement;
@@ -24,9 +25,11 @@ public abstract class Character : NetworkBehaviour
         OnUpdateAction?.Invoke();
     }
     [Command]
-    protected void CmdUpdatePosition(Vector3 position)
+    protected void CmdUpdatePosition(Vector3 position, Quaternion rotarion)
     {
         serverPosition = position;
+        serverRotarion = rotarion;
+
     }
     public abstract void Movement();
 }

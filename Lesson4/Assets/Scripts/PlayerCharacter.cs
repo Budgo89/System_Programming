@@ -9,16 +9,14 @@ namespace Assets.Scripts
 {
     public class PlayerCharacter : Character
     {
-        [Range(0, 100)][SerializeField] private int health = 100;
-        [Range(0.5f, 10.0f)][SerializeField] private float movingSpeed = 8.0f;
+        [Range(0, 100)] [SerializeField] private int health = 100;
+        [Range(0.5f, 10.0f)] [SerializeField] private float movingSpeed = 8.0f;
         [SerializeField] private float acceleration = 3.0f;
         private const float gravity = -9.8f;
         private CharacterController characterController;
         private MouseLook mouseLook;
         private Vector3 currentVelocity;
         protected override FireAction fireAction { get; set; }
-        //protected override FireAction fireAction { set => throw new NotImplementedException(); }
-        //protected override FireAction fireAction { get => throw new NotImplementedException(); set => throw new NotImplementedException(); };
 
         protected override void Initiate()
         {
@@ -30,12 +28,14 @@ namespace Assets.Scripts
             mouseLook = GetComponentInChildren<MouseLook>();
             mouseLook ??= gameObject.AddComponent<MouseLook>();
         }
+
         public override void Movement()
         {
             if (mouseLook != null && mouseLook.PlayerCamera != null)
             {
                 mouseLook.PlayerCamera.enabled = hasAuthority;
             }
+
             if (hasAuthority)
             {
                 var moveX = Input.GetAxis("Horizontal") * movingSpeed;
@@ -47,28 +47,33 @@ namespace Assets.Scripts
                 {
                     movement *= acceleration;
                 }
+
                 movement.y = gravity;
                 movement = transform.TransformDirection(movement);
                 characterController.Move(movement);
                 mouseLook.Rotation();
-                CmdUpdatePosition(transform.position);
+                CmdUpdatePosition(transform.position, transform.rotation);
             }
             else
             {
                 transform.position = Vector3.SmoothDamp(transform.position,
                     serverPosition, ref currentVelocity, movingSpeed * Time.deltaTime);
+                transform.rotation = Quaternion.Slerp(transform.rotation, serverRotarion, movingSpeed * Time.deltaTime);
             }
         }
+
         private void Start()
         {
             Initiate();
         }
+
         private void OnGUI()
         {
             if (Camera.main == null)
             {
                 return;
             }
+
             var info = $"Health: {health}\nClip: {fireAction.BulletCount}";
             var size = 12;
             var bulletCountSize = 50;
