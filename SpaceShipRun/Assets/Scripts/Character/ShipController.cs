@@ -1,4 +1,5 @@
 using System;
+using Assets.Scripts.Crystals;
 using Main;
 using Mechanics;
 using Network;
@@ -25,6 +26,8 @@ namespace Characters
         private float shipSpeed;
         private Rigidbody rb;
 
+        private SolarSystemNetworkManager _manager;
+
         [SyncVar] private string playerName;
 
         private void OnGUI()
@@ -47,6 +50,7 @@ namespace Characters
             cameraOrbit = FindObjectOfType<CameraOrbit>();
             cameraOrbit.Initiate(cameraAttach == null ? transform : cameraAttach);
             playerLabel = GetComponentInChildren<PlayerLabel>();
+            _manager = GameObject.Find("Main").GetComponent<SolarSystemNetworkManager>();
             base.OnStartAuthority();
         }
 
@@ -94,12 +98,27 @@ namespace Characters
         [ServerCallback]
         public void OnTriggerEnter(Collider collider)
         {
+            var crystalView = collider.gameObject.GetComponent<CrystalView>();
+            if (crystalView != null)
+            {
+                crystalView.gameObject.SetActive(false);
+                CmdUpdateCrystal(crystalView.gameObject);
+                return;
+            }
             var rand = new Random();
-            var newPosition = new Vector3(rand.Next(100, 500), rand.Next(100, 500), rand.Next(100, 500));
+            var newPosition = new Vector3(rand.Next(-500, 500), rand.Next(-500, 500), rand.Next(-500, 500));
 
             RpcChangePosition(newPosition);
             transform.position = newPosition;
+
         }
+
+        [Command]
+        private void CmdUpdateCrystal(GameObject gameObject)
+        {
+            _manager.UpdateCrystal(gameObject, playerName);
+        }
+
 
         [ClientRpc]
         private void RpcChangePosition(Vector3 position)
