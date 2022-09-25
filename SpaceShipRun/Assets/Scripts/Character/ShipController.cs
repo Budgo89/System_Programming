@@ -95,12 +95,13 @@ namespace Characters
         public void OnTriggerEnter(Collider collider)
         {
             var rand = new Random();
-            var newPosition = new Vector3(rand.Next(50, 200), rand.Next(50, 200), rand.Next(50, 200));
+            var newPosition = new Vector3(rand.Next(100, 500), rand.Next(100, 500), rand.Next(100, 500));
 
             RpcChangePosition(newPosition);
             transform.position = newPosition;
         }
 
+        [ClientRpc]
         private void RpcChangePosition(Vector3 position)
         {
             gameObject.SetActive(false);

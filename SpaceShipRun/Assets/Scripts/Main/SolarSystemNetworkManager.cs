@@ -1,13 +1,17 @@
 using System.Collections.Generic;
 using Characters;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
 namespace Main
 {
     public class SolarSystemNetworkManager : NetworkManager
     {
         [SerializeField] private string playerName;
+        [SerializeField] private TMP_InputField playerInputField;
+        [SerializeField] private TMP_Text tmpText;
 
         Dictionary<int, ShipController> _players = new Dictionary<int, ShipController>();
 
@@ -47,8 +51,10 @@ namespace Main
         {
             base.OnClientConnect(connection);
             MassageLogin _login = new MassageLogin();
-            _login.login = playerName;
+            _login.login = playerInputField.text;
             connection.Send(100, _login);
+            playerInputField.gameObject.SetActive(false);
+            tmpText.gameObject.SetActive(false);
         }
 
         public void ReceiveName(NetworkMessage networkMessage)
