@@ -1,9 +1,11 @@
+using System;
 using Main;
 using Mechanics;
 using Network;
 using UI;
 using UnityEngine;
 using UnityEngine.Networking;
+using Random = System.Random;
 
 namespace Characters
 {
@@ -89,6 +91,21 @@ namespace Characters
             cameraOrbit?.CameraMovement();
         }
 
-        
+        [ServerCallback]
+        public void OnTriggerEnter(Collider collider)
+        {
+            var rand = new Random();
+            var newPosition = new Vector3(rand.Next(50, 200), rand.Next(50, 200), rand.Next(50, 200));
+
+            RpcChangePosition(newPosition);
+            transform.position = newPosition;
+        }
+
+        private void RpcChangePosition(Vector3 position)
+        {
+            gameObject.SetActive(false);
+            transform.position = position;
+            gameObject.SetActive(true);
+        }
     }
 }
