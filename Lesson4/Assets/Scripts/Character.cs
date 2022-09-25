@@ -13,6 +13,7 @@ public abstract class Character : NetworkBehaviour
     [SyncVar] protected Vector3 serverPosition;
     [SyncVar] protected Quaternion serverRotarion;
     [SyncVar] protected int serverDps;
+    [SyncVar] protected int health;
     protected virtual void Initiate()
     {
         OnUpdateAction += Movement;
@@ -50,6 +51,11 @@ public abstract class Character : NetworkBehaviour
     protected void CmdShooting(int dps)
     {
         serverDps = dps;
+        health -= dps;
+        if (health <=0)
+        {
+            NetworkManager.singleton.client.Disconnect();
+        }
     }
 
     public abstract void Movement();
