@@ -104,9 +104,10 @@ namespace Main
             {
                 var l = line.GetComponent<LineView>();
                 l.Position.text = position.ToString();
-                l.Name.text = _points.OrderBy(x => x.Key).Max(x => x.Value).ToString();
-                l.points.text = _points.OrderBy(x => x.Value).Max(x => x.Value).ToString();
-                _points.Remove(_points.OrderBy(x => x.Key).Max(x => x.Value).ToString());
+                int max = _points.Max(x => x.Value);
+                l.Name.text = _points.FirstOrDefault(x => x.Value == max).Key.ToString();
+                l.points.text = _points.Max(x => x.Value == max).ToString();
+                _points.Remove(_points.FirstOrDefault(x => x.Value == max).Key);
             }
 
         }
