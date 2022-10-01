@@ -9,6 +9,20 @@
 /SystemProgramming/[Bb]uilds/
 /SystemProgramming/[Ll]ogs/
 /SystemProgramming/[Mm]emoryCaptures/
+/Lesson4/[Ll]ibrary/
+/Lesson4/[Tt]emp/
+/Lesson4/[Oo]bj/
+/Lesson4/[Bb]uild/
+/Lesson4/[Bb]uilds/
+/Lesson4/[Ll]ogs/
+/Lesson4/[Mm]emoryCaptures/
+/SpaceShipRun/[Ll]ibrary/
+/SpaceShipRun/[Tt]emp/
+/SpaceShipRun/[Oo]bj/
+/SpaceShipRun/[Bb]uild/
+/SpaceShipRun/[Bb]uilds/
+/SpaceShipRun/[Ll]ogs/
+/SpaceShipRun/[Mm]emoryCaptures/
 
 # Asset meta data should only be ignored when the corresponding asset is also ignored
 !/[Aa]ssets/**/*.meta
