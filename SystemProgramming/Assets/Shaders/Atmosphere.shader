@@ -4,11 +4,12 @@ Shader "Unlit/Atmosphere"
     {
         _Tex1("Texture1", 2D) = "white" {} // текстура1
         _Tex2("Texture2", 2D) = "white" {} // карта нормали
-
+        _Tex3("Texture2", 2D) = "white" {} // прозрачная
+        _Tex4("Texture2", 2D) = "white" {} // атмосфера
         _MixValue("Mix Value", Range(0,1)) = 0.5 // параметр смешивания текстур
         _Color("Main Color", COLOR) = (1,1,1,0.5) // цвет окрашивания
 
-        _MainColor("_MainColor", Color) = (1,1,1,1) //цвет атмосферы
+        //_MainColor("_MainColor", Color) = (1,1,1,1) //цвет атмосферы
         _Height("_Height", Range(0,10)) = 0.1
         _MainTex("Color (RGB) Alpha (A)", Range(0,1)) = 0.5
     }
@@ -81,8 +82,10 @@ Shader "Unlit/Atmosphere"
                 float4 vertex : SV_POSITION;
             };
 
-            sampler2D _Tex1; // текстура
-            float4 _Tex1_ST;
+            sampler2D _Tex3; // текстура
+            float4 _Tex3_ST;
+            sampler2D _Tex4; // текстура
+            float4 _Tex4_ST;
             float _Height;
             float4 _MainColor;
             float _MainTex;
@@ -92,24 +95,15 @@ Shader "Unlit/Atmosphere"
                 v2f result;
                 v.vertex.xyz += v.normal * _Height;
                 result.vertex = UnityObjectToClipPos(v.vertex);
-                result.uv = TRANSFORM_TEX(v.texcoord, _Tex1);
+                result.uv = TRANSFORM_TEX(v.texcoord, _Tex3);
                 return result;
             }
 
             fixed4 frag(v2f i) : SV_Target
             {
-                fixed4 color;                
-                //color = tex2D(_Tex1, i.uv);
-                //color = color * _MainColor;
-                //color = color * _MainTex;
-                /*color = tex2D(_MainColor, i.uv) * _MainTex;*/
-                //_MainColor.w = _MainTex;
-                //color.Albedo = color.rgb;
-                //color = _MainColor;
-                //color += tex2D(_Tex1, i.uv) * (1-_MainTex);
-                
-                
-                //color.w =  color.w * _MainTex;
+                fixed4 color;
+                color = tex2D(_Tex3, i.uv)*_MainTex;
+                color += tex2D(_Tex4, i.uv)*(1 - _MainTex);
                 UNITY_APPLY_FOG(i.fogCoord, color);
                 return color;
             }
