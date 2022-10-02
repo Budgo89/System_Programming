@@ -5,11 +5,9 @@ Shader "Unlit/Atmosphere"
         _Tex1("Texture1", 2D) = "white" {} // текстура1
         _Tex2("Texture2", 2D) = "white" {} // карта нормали
         _Tex3("Texture2", 2D) = "white" {} // прозрачная
-        _Tex4("Texture2", 2D) = "white" {} // атмосфера
         _MixValue("Mix Value", Range(0,1)) = 0.5 // параметр смешивания текстур
-        _Color("Main Color", COLOR) = (1,1,1,0.5) // цвет окрашивания
 
-        //_MainColor("_MainColor", Color) = (1,1,1,1) //цвет атмосферы
+        _MainColor("_MainColor", Color) = (1,1,1,1) //цвет атмосферы
         _Height("_Height", Range(0,10)) = 0.1
         _MainTex("Color (RGB) Alpha (A)", Range(0,1)) = 0.5
     }
@@ -29,8 +27,6 @@ Shader "Unlit/Atmosphere"
             sampler2D _Tex2; // текстура2
             float4 _Tex2_ST;
             float _MixValue; // параметр смешивания
-            float4 _Color; // цвет, которым будет окрашиваться изображение
-            // структура, которая помогает преобразовать данные вершины в данные фрагмента
 
 
 
@@ -58,13 +54,12 @@ Shader "Unlit/Atmosphere"
                 fixed4 color;
                 color = tex2D(_Tex1, i.uv) * _MixValue;
                 color += tex2D(_Tex2, i.uv) * (1 - _MixValue);
-                color = color * _Color;
                 return color;
 
             }
             ENDCG
         }
-
+            Blend SrcAlpha OneMinusSrcAlpha
         Pass
         {
             CGPROGRAM
@@ -84,8 +79,6 @@ Shader "Unlit/Atmosphere"
 
             sampler2D _Tex3; // текстура
             float4 _Tex3_ST;
-            sampler2D _Tex4; // текстура
-            float4 _Tex4_ST;
             float _Height;
             float4 _MainColor;
             float _MainTex;
@@ -103,7 +96,7 @@ Shader "Unlit/Atmosphere"
             {
                 fixed4 color;
                 color = tex2D(_Tex3, i.uv)*_MainTex;
-                color += tex2D(_Tex4, i.uv)*(1 - _MainTex);
+                color = color * _MainColor;
                 UNITY_APPLY_FOG(i.fogCoord, color);
                 return color;
             }
