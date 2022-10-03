@@ -125,7 +125,7 @@ Shader "Unlit/AtmosphereRings"
             {
                 v2f result;
                 v.vertex.xz += v.normal * _Height*4;
-                v.vertex.y -= v.normal * _Height / 10;
+                v.vertex.y = 0.1;
                 result.vertex = UnityObjectToClipPos(v.vertex);
                 result.uv = TRANSFORM_TEX(v.texcoord, _Tex2);
                 return result;
@@ -135,8 +135,6 @@ Shader "Unlit/AtmosphereRings"
             {
                 fixed4 color;
                 color = tex2D(_Tex2, i.uv)
-               // color = tex2D(_Tex1, i.uv)*_MainTex;
-                // color += tex2D(_Tex4, i.uv)*(1 - _MainTex);
                 UNITY_APPLY_FOG(i.fogCoord, color);
                 return color;
             }
