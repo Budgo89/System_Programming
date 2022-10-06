@@ -63,8 +63,7 @@ partial class CameraRenderer
 
     private void Settings(ScriptableCullingParameters parameters)
     {
-        _commandBuffer = new CommandBuffer
-        { name = _camera.name };
+        _commandBuffer = new CommandBuffer { name = _camera.name };
         _cullingResult = _context.Cull(ref parameters);
         _context.SetupCameraProperties(_camera);
         _commandBuffer.ClearRenderTarget(true, true, Color.clear);
