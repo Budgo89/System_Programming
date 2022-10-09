@@ -55,10 +55,7 @@ public class Fractal : MonoBehaviour
         _matrices = new NativeArray<Matrix4x4>[_depth];
         _matricesBuffers = new ComputeBuffer[_depth];
         var stride = 16 * 4;
-        for (int i = 0, length = 1;
-             i < _parts.Length;
-             i++, length *=
-                 _childCount)
+        for (int i = 0, length = 1; i < _parts.Length; i++, length *= _childCount)
         {
             _parts[i] = new NativeArray<FractalPart>(length, Allocator.Persistent);
             _matrices[i] = _matrices[i] = new NativeArray<Matrix4x4>(length, Allocator.Persistent);
