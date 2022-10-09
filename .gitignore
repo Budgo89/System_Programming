@@ -23,6 +23,13 @@
 /SpaceShipRun/[Bb]uilds/
 /SpaceShipRun/[Ll]ogs/
 /SpaceShipRun/[Mm]emoryCaptures/
+/Lesson9/[Ll]ibrary/
+/Lesson9/[Tt]emp/
+/Lesson9/[Oo]bj/
+/Lesson9/[Bb]uild/
+/Lesson9/[Bb]uilds/
+/Lesson9/[Ll]ogs/
+/Lesson9/[Mm]emoryCaptures/
 
 # Asset meta data should only be ignored when the corresponding asset is also ignored
 !/[Aa]ssets/**/*.meta
