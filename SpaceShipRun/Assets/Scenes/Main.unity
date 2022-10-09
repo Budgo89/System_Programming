@@ -773,6 +773,10 @@ MonoBehaviour:
   matchSize: 4
   isNetworkActive: 0
   matchMaker: {fileID: 0}
+  _meshAsteroid: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+  _materialAsteroid: {fileID: 2100000, guid: 1e5ee60f1e1ecf842b46975444138abf, type: 2}
+  _depthAsteroid: 10
+  _speedRotationAsteroid: 80
   playerInputField: {fileID: 1270245566}
   tmpText: {fileID: 1970370313}
   crystalPrefab: {fileID: 6326733604873342994, guid: 23e773e47e709054899630d1c3dd21d7, type: 3}

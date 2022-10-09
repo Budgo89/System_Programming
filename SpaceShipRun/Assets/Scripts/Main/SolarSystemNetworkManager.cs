@@ -9,6 +9,9 @@ using UnityEngine.UI;
 using Random = System.Random;
 #pragma warning disable 618
 using static UnityEngine.Networking.NetworkServer;
+using Unity.Collections;
+using UnityEngine.UIElements;
+using System.Reflection;
 #pragma warning restore 618
 
 namespace Main
@@ -17,6 +20,45 @@ namespace Main
     public class SolarSystemNetworkManager : NetworkManager
 #pragma warning restore 618
     {
+        struct FractalPart
+        {
+            public Vector3 WorldPosition;
+            public Quaternion WorldRotation;
+            public float SpinAngle;
+        }
+
+        #region Asteroid
+        [SerializeField] private Mesh _meshAsteroid;
+        [SerializeField] private Material _materialAsteroid;
+        [SerializeField, Range(10, 100)] private int _depthAsteroid = 10;
+        [SerializeField, Range(0, 360)] private int _speedRotationAsteroid = 80;
+        private const float _positionOffset = 1.5f;
+        private const float _scaleBias = .5f;
+        private const int _childCount = 5;
+        private FractalPart[] _parts;
+        private Matrix4x4[] _matrices;
+        private ComputeBuffer _matricesBuffers;
+        private static readonly int _matricesId = Shader.PropertyToID("_Matrices");
+        private static MaterialPropertyBlock _propertyBlock;
+
+        private static readonly Vector3[] _directions =
+        {
+            Vector3.up,
+            Vector3.left,
+            Vector3.right,
+            Vector3.forward,
+            Vector3.back
+        };
+
+        private static readonly Quaternion[] _rotations =
+        {
+            Quaternion.identity,
+            Quaternion.Euler(.0f, .0f, 90.0f),
+            Quaternion.Euler(.0f, .0f, -90.0f),
+            Quaternion.Euler(90.0f, .0f, .0f),
+            Quaternion.Euler(-90.0f, .0f, .0f)
+        };
+        #endregion
 
         [SerializeField] private TMP_InputField playerInputField;
         [SerializeField] private TMP_Text tmpText;
@@ -127,6 +169,84 @@ namespace Main
             {
                 NetworkServer.Spawn(crystal);
             }
+        }
+
+        private void OnEnable()
+        {
+            _parts = new FractalPart[_depthAsteroid];
+            _matrices = new Matrix4x4[_depthAsteroid];
+            //_matricesBuffers = new ComputeBuffer();
+            var stride = 16 * 4;
+            for (int i = 0, length = 1; i < _parts.Length; i++, length++)
+            {
+                _parts[i] = new FractalPart();
+                _matrices[i] = _matrices[i] = new Matrix4x4();
+                _matricesBuffers = new ComputeBuffer(length, stride);
+            }
+            _parts[0] = CreatePart(0);
+            for (var li = 1; li < _parts.Length; li++)
+            {
+                _parts[li] = CreatePart(li);
+
+            }
+            _propertyBlock ??= new MaterialPropertyBlock();
+        }
+
+        private void OnDisable()
+        {
+            _matricesBuffers.Dispose();
+            _parts = null;
+            _matrices = null;
+            _matricesBuffers = null;
+        }
+        private void OnValidate()
+        {
+            if (_parts is null || !enabled)
+            {
+                return;
+            }
+
+            OnDisable();
+            OnEnable();
+        }
+        private FractalPart CreatePart(int i) => new FractalPart
+        {
+            WorldPosition = _directions[i],
+            WorldRotation = _rotations[i],
+        };
+
+        private void Update()
+        {
+            var spinAngelDelta = _speedRotationAsteroid * Time.deltaTime;
+            var rootPart = _parts[0];
+            rootPart.SpinAngle += spinAngelDelta;
+            var deltaRotation = Quaternion.Euler(.0f, rootPart.SpinAngle, .0f);
+            rootPart.WorldRotation = rootPart.WorldRotation * deltaRotation;
+            _parts[0] = rootPart;
+            _matrices[0] = Matrix4x4.TRS(rootPart.WorldPosition,
+                rootPart.WorldRotation, Vector3.one);
+            var scale = 1.0f;
+            int li;
+            for (li = 1; li < _parts.Length; li++)
+            {
+                var parent = _parts[li / _childCount];
+                var part = _parts[li];
+                part.SpinAngle += spinAngelDelta;
+                deltaRotation = Quaternion.Euler(.0f, part.SpinAngle, .0f);
+                part.WorldRotation = parent.WorldRotation * part.WorldRotation * deltaRotation;
+                part.WorldPosition = parent.WorldPosition +
+                                     parent.WorldRotation * (_positionOffset * scale * part.WorldPosition);
+                _parts[li] = part;
+                _matrices[li] = Matrix4x4.TRS(part.WorldPosition, part.WorldRotation, scale * Vector3.one);
+            }
+
+            var bounds = new Bounds(rootPart.WorldPosition, 3f * Vector3.one);
+            var buffer = _matricesBuffers;
+                buffer.SetData(_matrices);
+                _propertyBlock.SetBuffer(_matricesId, buffer);
+                _materialAsteroid.SetBuffer(_matricesId, buffer);
+                Graphics.DrawMeshInstancedProcedural(_meshAsteroid, 0, _materialAsteroid, bounds, buffer.count, _propertyBlock);
+            
         }
     }
 }
