@@ -30,6 +30,13 @@
 /Lesson9/[Bb]uilds/
 /Lesson9/[Ll]ogs/
 /Lesson9/[Mm]emoryCaptures/
+/Lesson10/[Ll]ibrary/
+/Lesson10/[Tt]emp/
+/Lesson10/[Oo]bj/
+/Lesson10/[Bb]uild/
+/Lesson10/[Bb]uilds/
+/Lesson10/[Ll]ogs/
+/Lesson10/[Mm]emoryCaptures/
 
 # Asset meta data should only be ignored when the corresponding asset is also ignored
 !/[Aa]ssets/**/*.meta
