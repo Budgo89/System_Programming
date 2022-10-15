@@ -5,7 +5,7 @@ using UnityEditor;
 using System;
 using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;
-[CustomEditor(typeof(MeshModify))]
+//[CustomEditor(typeof(MeshModify))]
 public class MeshModifyerEditor : Editor
 {
     enum SupportedAspects
