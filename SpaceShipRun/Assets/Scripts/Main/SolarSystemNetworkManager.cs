@@ -12,6 +12,7 @@ using static UnityEngine.Networking.NetworkServer;
 using Unity.Collections;
 using UnityEngine.UIElements;
 using System.Reflection;
+using Assets.Scripts.Crystals;
 #pragma warning restore 618
 
 namespace Main
@@ -28,36 +29,39 @@ namespace Main
         }
 
         #region Asteroid
-        [SerializeField] private Mesh _meshAsteroid;
-        [SerializeField] private Material _materialAsteroid;
-        [SerializeField, Range(10, 100)] private int _depthAsteroid = 10;
-        [SerializeField, Range(0, 360)] private int _speedRotationAsteroid = 80;
-        private const float _positionOffset = 1.5f;
-        private const float _scaleBias = .5f;
-        private const int _childCount = 5;
-        private FractalPart[] _parts;
-        private Matrix4x4[] _matrices;
-        private ComputeBuffer _matricesBuffers;
-        private static readonly int _matricesId = Shader.PropertyToID("_Matrices");
-        private static MaterialPropertyBlock _propertyBlock;
+        //[SerializeField] private Mesh _meshAsteroid;
+        //[SerializeField] private Material _materialAsteroid;
+        //[SerializeField, Range(10, 100)] private int _depthAsteroid = 10;
+        //[SerializeField, Range(0, 360)] private int _speedRotationAsteroid = 80;
+        //[SerializeField] private Crystals Crystal;
 
-        private static readonly Vector3[] _directions =
-        {
-            Vector3.up,
-            Vector3.left,
-            Vector3.right,
-            Vector3.forward,
-            Vector3.back
-        };
 
-        private static readonly Quaternion[] _rotations =
-        {
-            Quaternion.identity,
-            Quaternion.Euler(.0f, .0f, 90.0f),
-            Quaternion.Euler(.0f, .0f, -90.0f),
-            Quaternion.Euler(90.0f, .0f, .0f),
-            Quaternion.Euler(-90.0f, .0f, .0f)
-        };
+        //private const float _positionOffset = 1.5f;
+        //private const float _scaleBias = .5f;
+        //private const int _childCount = 5;
+        //private FractalPart[] _parts;
+        //private Matrix4x4[] _matrices;
+        //private ComputeBuffer _matricesBuffers;
+        //private static readonly int _matricesId = Shader.PropertyToID("_Matrices");
+        //private static MaterialPropertyBlock _propertyBlock;
+
+        //private static readonly Vector3[] _directions =
+        //{
+        //    Vector3.up,
+        //    Vector3.left,
+        //    Vector3.right,
+        //    Vector3.forward,
+        //    Vector3.back
+        //};
+
+        //private static readonly Quaternion[] _rotations =
+        //{
+        //    Quaternion.identity,
+        //    Quaternion.Euler(.0f, .0f, 90.0f),
+        //    Quaternion.Euler(.0f, .0f, -90.0f),
+        //    Quaternion.Euler(90.0f, .0f, .0f),
+        //    Quaternion.Euler(-90.0f, .0f, .0f)
+        //};
         #endregion
 
         [SerializeField] private TMP_InputField playerInputField;
@@ -65,7 +69,10 @@ namespace Main
         [SerializeField] private GameObject crystalPrefab;
         [SerializeField] private GameObject linePrefab;
         [SerializeField] private Transform lineParent;
-        public List<GameObject> crystals;
+        [HideInInspector] public int _countCrystal = 1;
+        [HideInInspector] public int max;
+        [HideInInspector] public int min;
+        [HideInInspector] public List<GameObject> crystals;
 
         private Dictionary<int, ShipController> _players = new Dictionary<int, ShipController>();
         private Dictionary<string, int> _points = new Dictionary<string, int>();
@@ -97,7 +104,7 @@ namespace Main
         {
             base.OnStartServer();
             NetworkServer.RegisterHandler(100, ReceiveName);
-            
+
         }
 
         public class MassageLogin : MessageBase
@@ -158,9 +165,10 @@ namespace Main
         {
             crystals = new List<GameObject>();
             var rand = new Random();
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < _countCrystal; i++)
             {
-                var pos = new Vector3(rand.Next(-500, 500), rand.Next(-50, 50), rand.Next(-500, 500));
+                var points = CrystalPos(min, max);
+                var pos = new Vector3(points.Item1, rand.Next(-50, 50), points.Item2);
                 crystals.Add(Instantiate(crystalPrefab, pos, transform.rotation));
 
             }
@@ -171,82 +179,125 @@ namespace Main
             }
         }
 
-        private void OnEnable()
+        private (int, int) CrystalPos(int min, int max)
         {
-            _parts = new FractalPart[_depthAsteroid];
-            _matrices = new Matrix4x4[_depthAsteroid];
-            //_matricesBuffers = new ComputeBuffer();
-            var stride = 16 * 4;
-            for (int i = 0, length = 1; i < _parts.Length; i++, length++)
-            {
-                _parts[i] = new FractalPart();
-                _matrices[i] = _matrices[i] = new Matrix4x4();
-                _matricesBuffers = new ComputeBuffer(length, stride);
-            }
-            _parts[0] = CreatePart(0);
-            for (var li = 1; li < _parts.Length; li++)
-            {
-                _parts[li] = CreatePart(li);
+            var rand = new Random();
+            int point1;
+            int point2;
 
-            }
-            _propertyBlock ??= new MaterialPropertyBlock();
-        }
+            var poin1Rand = rand.Next(-max, max);
+            var poin2Rand = rand.Next(-max, max);
 
-        private void OnDisable()
-        {
-            _matricesBuffers.Dispose();
-            _parts = null;
-            _matrices = null;
-            _matricesBuffers = null;
-        }
-        private void OnValidate()
-        {
-            if (_parts is null || !enabled)
+            if ((poin1Rand * poin1Rand) + (poin2Rand * poin2Rand) <= 100)
             {
-                return;
-            }
+                if (poin1Rand > 0)
+                {
+                    point1 = poin1Rand >= min ? poin1Rand : 0;
+                }
+                else if(poin1Rand == 0)
+                {
+                    return CrystalPos(min, max);
+                }
+                else
+                {
+                    point1 = poin1Rand <= -min ? poin1Rand : 0;
+                }
 
-            OnDisable();
-            OnEnable();
-        }
-        private FractalPart CreatePart(int i) => new FractalPart
-        {
-            WorldPosition = _directions[i],
-            WorldRotation = _rotations[i],
-        };
+                if (poin2Rand > 0)
+                {
+                    point2 = poin2Rand >= min ? poin2Rand : 0;
+                }
+                else if (poin2Rand == 0)
+                {
+                    return CrystalPos(min, max);
+                }
+                else
+                {
+                    point2 = poin2Rand <= -min ? poin2Rand : 0;
+                }
 
-        private void Update()
-        {
-            var spinAngelDelta = _speedRotationAsteroid * Time.deltaTime;
-            var rootPart = _parts[0];
-            rootPart.SpinAngle += spinAngelDelta;
-            var deltaRotation = Quaternion.Euler(.0f, rootPart.SpinAngle, .0f);
-            rootPart.WorldRotation = rootPart.WorldRotation * deltaRotation;
-            _parts[0] = rootPart;
-            _matrices[0] = Matrix4x4.TRS(rootPart.WorldPosition,
-                rootPart.WorldRotation, Vector3.one);
-            var scale = 1.0f;
-            int li;
-            for (li = 1; li < _parts.Length; li++)
-            {
-                var parent = _parts[li / _childCount];
-                var part = _parts[li];
-                part.SpinAngle += spinAngelDelta;
-                deltaRotation = Quaternion.Euler(.0f, part.SpinAngle, .0f);
-                part.WorldRotation = parent.WorldRotation * part.WorldRotation * deltaRotation;
-                part.WorldPosition = parent.WorldPosition +
-                                     parent.WorldRotation * (_positionOffset * scale * part.WorldPosition);
-                _parts[li] = part;
-                _matrices[li] = Matrix4x4.TRS(part.WorldPosition, part.WorldRotation, scale * Vector3.one);
+                return point1 != 0 && point2 != 0 ? (point1, point2) : CrystalPos(min, max);
             }
 
-            var bounds = new Bounds(rootPart.WorldPosition, 3f * Vector3.one);
-            var buffer = _matricesBuffers;
-                buffer.SetData(_matrices);
-                _propertyBlock.SetBuffer(_matricesId, buffer);
-                _materialAsteroid.SetBuffer(_matricesId, buffer);
-                Graphics.DrawMeshInstancedProcedural(_meshAsteroid, 0, _materialAsteroid, bounds, buffer.count, _propertyBlock);
-            
+            return CrystalPos(min, max);
         }
+
+        //private void OnEnable()
+        //{
+        //    _parts = new FractalPart[_depthAsteroid];
+        //    _matrices = new Matrix4x4[_depthAsteroid];
+        //    //_matricesBuffers = new ComputeBuffer();
+        //    var stride = 16 * 4;
+        //    for (int i = 0, length = 1; i < _parts.Length; i++, length++)
+        //    {
+        //        _parts[i] = new FractalPart();
+        //        _matrices[i] = _matrices[i] = new Matrix4x4();
+        //        _matricesBuffers = new ComputeBuffer(length, stride);
+        //    }
+        //    _parts[0] = CreatePart(0);
+        //    for (var li = 1; li < _parts.Length; li++)
+        //    {
+        //        _parts[li] = CreatePart(li);
+
+        //    }
+        //    _propertyBlock ??= new MaterialPropertyBlock();
+        //}
+
+        //private void OnDisable()
+        //{
+        //    _matricesBuffers?.Dispose();
+        //    _parts = null;
+        //    _matrices = null;
+        //    _matricesBuffers = null;
+        //}
+        //private void OnValidate()
+        //{
+        //    if (_parts is null || !enabled)
+        //    {
+        //        return;
+        //    }
+
+        //    OnDisable();
+        //    //OnEnable();
+        //}
+        //private FractalPart CreatePart(int i) => new FractalPart
+        //{
+        //    WorldPosition = _directions[i],
+        //    WorldRotation = _rotations[i],
+        //};
+
+        //private void Update()
+        //{
+        //    //var spinAngelDelta = _speedRotationAsteroid * Time.deltaTime;
+        //    //var rootPart = _parts[0];
+        //    //rootPart.SpinAngle += spinAngelDelta;
+        //    //var deltaRotation = Quaternion.Euler(.0f, rootPart.SpinAngle, .0f);
+        //    //rootPart.WorldRotation = rootPart.WorldRotation * deltaRotation;
+        //    //_parts[0] = rootPart;
+        //    //_matrices[0] = Matrix4x4.TRS(rootPart.WorldPosition,
+        //    //    rootPart.WorldRotation, Vector3.one);
+        //    //var scale = 1.0f;
+        //    //int li;
+        //    //for (li = 1; li < _parts.Length; li++)
+        //    //{
+        //    //    var parent = _parts[li / _childCount];
+        //    //    var part = _parts[li];
+        //    //    part.SpinAngle += spinAngelDelta;
+        //    //    deltaRotation = Quaternion.Euler(.0f, part.SpinAngle, .0f);
+        //    //    part.WorldRotation = parent.WorldRotation * part.WorldRotation * deltaRotation;
+        //    //    part.WorldPosition = parent.WorldPosition +
+        //    //                         parent.WorldRotation * (_positionOffset * scale * part.WorldPosition);
+        //    //    _parts[li] = part;
+        //    //    //_matrices[li] = Matrix4x4.TRS(part.WorldPosition, part.WorldRotation, scale * Vector3.one);
+        //    //}
+
+        //    //var bounds = new Bounds(rootPart.WorldPosition, 3f * Vector3.one);
+        //    //var buffer = _matricesBuffers;
+        //    //    buffer.SetData(_matrices);
+        //    //    _propertyBlock.SetBuffer(_matricesId, buffer);
+        //    //    _materialAsteroid.SetBuffer(_matricesId, buffer);
+        //    //    Graphics.DrawMeshInstancedProcedural(_meshAsteroid, 0, _materialAsteroid, bounds, buffer.count, _propertyBlock);
+
+        //}
     }
 }
