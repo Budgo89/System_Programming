@@ -824,7 +824,7 @@ MonoBehaviour:
   m_PlayerPrefab: {fileID: 0}
   m_AutoCreatePlayer: 1
   m_PlayerSpawnMethod: 0
-  m_OfflineScene: 
+  m_OfflineScene: Main
   m_OnlineScene: 
   m_SpawnPrefabs: []
   m_CustomConfig: 0
@@ -2414,6 +2414,8 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 2e4ea6337c8809f469e3379e622fc2ef, type: 2}
+  - {fileID: 2100000, guid: 2e4ea6337c8809f469e3379e622fc2ef, type: 2}
+  - {fileID: 2100000, guid: 2e4ea6337c8809f469e3379e622fc2ef, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2856,6 +2858,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
+  - {fileID: 2100000, guid: 30fa97a0be0a56d4f99853cb121c848c, type: 2}
   - {fileID: 2100000, guid: 3c0495814b596e6429d447ac5aa0a72e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
